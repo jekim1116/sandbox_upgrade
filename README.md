@@ -39,29 +39,6 @@
 #### 3. 실행 및 휘발성 관리
 작업이 종료되면 복제했던 원본 소스 파일들만 즉시 삭제(Cleanup)하여, 결과물 폴더에는 오직 샌드박스가 생성한 결과 파일과 로그(`stdout.txt`)만 남게 됩니다.
 
-```mermaid
-graph TD
-    subgraph "Docker Container (Worker)"
-        Queue[BullMQ Worker - Concurrency: 5]
-        
-        subgraph CJ1 ["Concurrent Job 1"]
-            Dir1["sandbox_output/.../Job1"] -- bind -- Bwrap1["Instance 1"]
-        end
-        
-        subgraph CJ2 ["Concurrent Job 2"]
-            Dir2["sandbox_output/.../Job2"] -- bind -- Bwrap2["Instance 2"]
-        end
-        
-        subgraph CJN ["Concurrent Job N"]
-            DirN["sandbox_output/.../JobN"] -- bind -- BwrapN["Instance N"]
-        end
-        
-        Queue --> CJ1
-        Queue --> CJ2
-        Queue --> CJN
-    end
-```
-
 ---
 
 ### 🔄 실행 Flow 시퀀스
