@@ -1,0 +1,5 @@
+{
+  "minWordLength": 3,
+  "topN": 5,
+  "stopWords": ["the", "and", "that", "this", "with", "from", "for", "was", "were", "are", "but", "not"]
+}

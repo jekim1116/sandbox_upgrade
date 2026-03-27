@@ -1,0 +1,10 @@
+{
+  "name": "data-processor",
+  "version": "1.0.0",
+  "description": "A complex plugin to test multi-file handling and dependencies",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "axios": "^1.6.8"
+  }
+}

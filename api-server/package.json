@@ -1,0 +1,8 @@
+{
+  "name": "api-server",
+  "main": "index.js",
+  "dependencies": {
+    "bullmq": "^4.12.3",
+    "ioredis": "^5.3.2"
+  }
+}
