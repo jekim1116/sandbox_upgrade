@@ -1,0 +1,16 @@
+FROM node:18-bullseye-slim
+
+RUN apt-get update && apt-get install -y bubblewrap && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 기본 패키지 (모든 Node.js 플러그인 공통)
+RUN npm install lodash axios dayjs
+
+# {{PLUGIN_PACKAGES}}
+
+RUN npm install bullmq@4
+
+COPY worker-server/ .
+
+CMD ["node", "index.js"]

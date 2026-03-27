@@ -1,0 +1,30 @@
+services:
+  # 1. 메시지 큐 (Redis)
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  # 2. API 서버
+  api-server:
+    build: ./api-server
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - PLUGINS_DIR=/app/plugins
+      - TEMPLATES_DIR=/app/dockerfile_templates
+      - SANDBOX_OUTPUT_HOST_DIR=${PWD}/sandbox_output
+      - DOCKER_NETWORK=my-sandbox-project_default
+      - PLUGINS_HOST_DIR=${PWD}/plugins
+    depends_on:
+      - redis
+    volumes:
+      - ./plugins:/app/plugins:ro
+      - ./sandbox_output:/app/sandbox_output:rw
+      - ./worker-server/dockerfile_templates:/app/dockerfile_templates:ro
+      - ./worker-server:/app/worker-server:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/build-context:ro
+
+  # 워커는 run_image 함수에 의해 동적으로 생성됩니다

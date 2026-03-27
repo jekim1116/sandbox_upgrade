@@ -1,0 +1,5 @@
+Artificial intelligence is intelligence demonstrated by machines, as opposed to the natural intelligence displayed by animals including humans. Leading AI textbooks define the field as the study of intelligent agents: any system that perceives its environment and takes actions that maximize its chance of achieving its goals.
+Some popular accounts use the term artificial intelligence to describe machines that mimic cognitive functions that humans associate with the human mind, such as learning and problem solving.
+The AI field draws upon computer science, information engineering, mathematics, psychology, linguistics, philosophy, and many other fields.
+The field was founded on the assumption that human intelligence can be so precisely described that a machine can be made to simulate it.
+This raises philosophical arguments about the mind and the ethics of creating artificial beings endowed with human-like intelligence.

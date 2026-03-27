@@ -1,0 +1,25 @@
+{
+  "totalWordsFiltered": 90,
+  "topWords": [
+    {
+      "word": "intelligence",
+      "count": 6
+    },
+    {
+      "word": "artificial",
+      "count": 3
+    },
+    {
+      "word": "field",
+      "count": 3
+    },
+    {
+      "word": "its",
+      "count": 3
+    },
+    {
+      "word": "machines",
+      "count": 2
+    }
+  ]
+}
