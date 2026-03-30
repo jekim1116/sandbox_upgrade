@@ -1,26 +1,25 @@
-# 🛡️ 샌드박스 기반 이중 격리 아키텍처 (2-Layer Isolation)
+# 🛡️ 샌드박스 기반 아키텍처 
 
-본 문서는 `api-server` 엔진의 핵심 기술인 **Bubblewrap(bwrap)** 기반의 샌드박싱 메커니즘과 보안 격리 전략을 상세히 설명합니다.
+## 🎨 역할 분담 기반의 이중 격리 체계 (2-Layer Isolation)
 
----
+본 시스템은 단순히 무식하게 겹겹이 싼 격리가 아니라, **[런타임 환경 조성]과 [작업 고립]의 책임을 완벽히 분리**하여 시스템의 유연성과 안전성을 동시에 잡았습니다.
 
-## 🎨 이중 격리 전략 (2-Layer Isolation)
+### 🛡️ Layer 1. Docker Container: 호스트와 분리된 동적 런타임 이미지 풀
+- **역할 (Runtime Image Management)**: 각 플러그인(Node.js, Python 등)마다 요구하는 서로 다른 OS 환경, 의존성 라이브러리 패키지를 호스트 OS 어지럽힘 전혀 없이 개별 **이미지로 독립 관리**합니다.
+- **가치**: 샌드박스의 기반이 되는 '도화지' 자체를 호스트와 분리시켜, 런타임 버전 충돌이나 패키지 오염을 원천 차단합니다. 
 
-본 시스템은 악성 코드의 폭주와 시스템 우회를 완벽히 차단하기 위해 **Docker Container**와 **Bubblewrap Sandbox**로 구성된 강력한 **이중 격리 체계(2-Layer Isolation)**를 구현합니다.
-
-### 🛡️ Active Isolation Layers
-보호 대상인 **Host OS** 위에서, 시스템은 크게 두 가지 능동적인 격리 계층을 가집니다:
-1. **Layer 1 (Docker Container)**: 리소스 제한(CPU/Memory) 및 Cgroups 네임스페이스 격리를 제공하여, 워커 컨테이너 전체의 물리적 폭주나 호스트와의 간섭을 1차적으로 방지합니다.
-2. **Layer 2 (Bubblewrap/bwrap)**: 런타임 내부의 공격을 막는 2차 방어선입니다. 프로세스 권한을 완전히 박탈하고 커널 네임스페이스 수준에서 코드를 한 번 더 고립시킵니다. 네트워크를 원천 차단하고 시스템 전체를 읽기 전용으로 강제하며, 오직 지정된 폴더(`/tmp/workspace`)에만 접근하게 만듭니다.
+### 🛡️ Layer 2. Bubblewrap (bwrap): 완벽히 통제된 격리 실행 환경
+- **역할 (Execution Isolation)**: 컨테이너라는 든든한 기반 위에서, 실제 외부 스크립트가 실행될 때 개입하는 **보안의 핵심 코어**입니다.
+- **가치**: 런타임 내부의 프로세스 권한마저 박탈하고, 커널 네임스페이스 수준에서 코드를 고립시킵니다. 네트워크 통신을 차단하고, 시스템 전체를 읽기 전용으로 강제하며, 오직 지정된 특정 폴더(`/tmp/workspace`)에만 접근하게 만들어 완벽한 보안 스웜(sandbox)을 형성합니다.
 
 ### 🌐 샌드박스 전체 시스템 개괄 (High-Level Architecture)
 
-`API Server`가 `BullMQ (Redis)`를 통해 작업을 위임하면, 큐에서는 각 플러그인별로 할당된 단일 **Docker 컨테이너(Worker)**로 작업을 라우팅합니다. 
+`AgentX`가 `BullMQ (Redis)`를 통해 작업을 위임하면, 큐에서는 각 플러그인별로 할당된 단일 **Docker 컨테이너(Worker)**로 작업을 라우팅합니다. 
 각 워커 컨테이너 내부는 **동시성(Concurrency) 5**로 설정되어 있어, 동시에 들어온 여러 요청이 서로 간섭하지 않도록 **각각 물리적으로 다른 폴더에 격리된 채 `bwrap`을 통해 병렬 실행**됩니다.
 
 ```mermaid
 graph TD
-    API[API Server] -->|Job Request| BullMQ[(Redis / BullMQ Queue)]
+    API[AgentX] -->|Job Request| BullMQ[(Redis / BullMQ Queue)]
     
     BullMQ -->|queue:pluginA| WorkerA
     BullMQ -->|queue:pluginB| WorkerB
@@ -85,7 +84,7 @@ API 매니저 모듈(`sandbox_manager`)을 통해 요청을 보냈을 때 워커
 
 ```mermaid
 sequenceDiagram
-    participant API as API Server (Manager)
+    participant API as AgentX (Sandbox Manager)
     participant Redis as BullMQ (Queue)
     participant Worker as Worker Container
     participant Bwrap as bwrap Sandbox
